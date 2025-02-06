@@ -18,4 +18,5 @@ class Message(models.Model):
     conversation = models.ForeignKey(Conversation, related_name='messages', on_delete=models.CASCADE)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
     content = models.TextField()
+    translated_content = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

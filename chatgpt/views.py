@@ -1,4 +1,5 @@
 # chatgpt/views.py
+import re
 from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -97,6 +98,8 @@ class ChatViewSet(viewsets.ModelViewSet):
 
 사용자의 메시지: {user_message}
 
+
+사용자의 메세지를 읽고 번역된 메세지를 반드시 다음의 형식으로 작성해주세요.
 답변형식: "사용자의 메세지" : "번역된 메세지"
 """
 
@@ -106,19 +109,27 @@ class ChatViewSet(viewsets.ModelViewSet):
             except Exception as api_error:
                 print(f"API 호출 실패: {str(api_error)}")
                 bot_response = "죄송해요, 지금은 제가 잠시 말을 잘 못하겠어요. 잠시 후에 다시 이야기해주실래요?"
+            
+            print(f"원본 메시지: {bot_response}")
+            
+            # 응답에서 번역된 메시지 추출
+            try:
+                match = re.search(r':\s*"([^"]+)"', bot_response)
+                translated_message = match.group(1) if match else bot_response.strip()
 
+                print(f"추출 메시지: {translated_message}")
+            except:
+                translated_message = bot_response
+
+            
+            
             # 봇 응답 저장
             Message.objects.create(
                 conversation=conversation,
                 role='assistant',
-                content=bot_response
+                content=bot_response,
+                translated_content=translated_message
             )
-
-            # 응답에서 번역된 메시지 추출
-            try:
-                translated_message = bot_response.split('"번역된 메시지"')[1].split('"')[1]
-            except:
-                translated_message = bot_response
 
             return Response({
                 'message': translated_message
