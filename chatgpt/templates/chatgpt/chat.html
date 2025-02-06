@@ -81,12 +81,38 @@
         height: 100%;
       }
 
+      .split-chat-container {
+        flex-grow: 1;
+        display: flex;
+        height: 100%;
+      }
+
+      .chat-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid #e0e0e0;
+      }
+
+      .chat-section:last-child {
+        border-right: none;
+      }
+
+      .chat-header {
+        padding: 15px;
+        background: #f0f0f0;
+        text-align: center;
+        font-weight: bold;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
       .messages {
         flex-grow: 1;
         padding: 20px;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
+        max-height: calc(100vh - 200px); /* 채팅창 높이 제한 */
       }
 
       .message {
@@ -97,22 +123,40 @@
         line-height: 1.5;
       }
 
+      .assistant-message {
+        background: #f0f0f0;
+        color: #000;
+        align-self: flex-start;  /* 왼쪽 정렬 */
+      }
+
       .user-message {
         background: #10a37f;
         color: white;
-        align-self: flex-end;
-      }
-
-      .assistant-message {
-        background: #f7f7f8;
-        color: #000;
-        align-self: flex-start;
+        align-self: flex-end;    /* 오른쪽 정렬 */
       }
 
       .input-container {
         padding: 20px;
         background: #fff;
         border-top: 1px solid #e0e0e0;
+        position: sticky;
+        bottom: 0;
+      }
+
+      .prompt-box {
+        margin-bottom: 10px;
+      }
+
+      #systemPrompt {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        resize: vertical;
+        min-height: 80px;
+        margin-bottom: 10px;
+        background: #f7f7f8;
       }
 
       .input-box {
@@ -142,6 +186,79 @@
         color: #666;
         margin-top: 5px;
       }
+
+      .conversation-item {
+        display: flex;
+        align-items: center;
+        margin: 5px 0;
+        gap: 5px;
+      }
+
+      .delete-btn {
+        background: #ff4444;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+      }
+
+      .delete-btn:hover {
+        opacity: 1;
+      }
+
+      .split-input {
+        display: flex;
+        gap: 20px;
+      }
+
+      .input-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .input-section .prompt-box {
+        margin-bottom: 0;
+      }
+
+      .input-section:first-child .send-btn {
+        background: #10a37f;
+      }
+
+      .input-section:last-child .send-btn {
+        background: #7f10a3;
+      }
+
+      .left-message {
+        background: #e8f5e9;
+      }
+
+      .right-message {
+        background: #f3e5f5;
+      }
+
+      /* 스크롤바 스타일링 */
+      .messages::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .messages::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+
+      .messages::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+      }
+
+      .messages::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
     </style>
   </head>
   <body>
@@ -156,6 +273,13 @@
       <div class="chat-container">
         <div class="messages" id="messageContainer"></div>
         <div class="input-container">
+          <div class="prompt-box">
+            <textarea
+              id="systemPrompt"
+              placeholder="상대방의 성격을 설정하세요... (예: 귀엽게, 차갑게, 다정하게 등)"
+              rows="3"
+            ></textarea>
+          </div>
           <div class="input-box">
             <input
               type="text"
@@ -180,6 +304,9 @@
           conversationList.innerHTML = "";
 
           data.forEach((conv, index) => {
+            const itemDiv = document.createElement("div");
+            itemDiv.classList.add("conversation-item");
+
             const button = document.createElement("button");
             button.classList.add("conversation-btn");
             if (conv.id === parseInt(conversationId)) {
@@ -187,7 +314,18 @@
             }
             button.textContent = `${index + 1}번 대화`;
             button.onclick = () => switchConversation(conv.id);
-            conversationList.appendChild(button);
+            
+            const deleteBtn = document.createElement("button");
+            deleteBtn.classList.add("delete-btn");
+            deleteBtn.textContent = "삭제";
+            deleteBtn.onclick = (e) => {
+              e.stopPropagation();
+              deleteConversation(conv.id);
+            };
+
+            itemDiv.appendChild(button);
+            itemDiv.appendChild(deleteBtn);
+            conversationList.appendChild(itemDiv);
           });
         } catch (error) {
           console.error("Error:", error);
@@ -205,14 +343,14 @@
           messageContainer.innerHTML = "";
 
           data.messages.forEach((message) => {
-            addMessage(
-              message.content,
-              message.role,
-              new Date(message.created_at)
-            );
+            addMessage(message.content, message.role, new Date(message.created_at));
           });
 
-          scrollToBottom();
+          // 스크롤 위치 조정 (선택적)
+          const lastMessage = messageContainer.lastElementChild;
+          if (lastMessage) {
+            lastMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
         } catch (error) {
           console.error("Error:", error);
         }
@@ -244,6 +382,16 @@
         messageDiv.classList.add("message", `${role}-message`);
 
         const contentDiv = document.createElement("div");
+        
+        // AI 응답에서 "번역된 메시지" 부분만 추출
+        if (role === 'assistant' && content.includes('"번역된 메시지"')) {
+          try {
+            content = content.split('"번역된 메시지"')[1].split('"')[1];
+          } catch (e) {
+            console.error("메시지 파싱 실패:", e);
+          }
+        }
+        
         contentDiv.textContent = content;
 
         const timeDiv = document.createElement("div");
@@ -254,17 +402,15 @@
         messageDiv.appendChild(timeDiv);
         messageContainer.appendChild(messageDiv);
 
-        scrollToBottom();
-      }
-
-      function scrollToBottom() {
-        const messageContainer = document.getElementById("messageContainer");
-        messageContainer.scrollTop = messageContainer.scrollHeight;
+        // 새 메시지가 추가될 때 부드럽게 스크롤
+        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
 
       async function sendMessage() {
         const messageInput = document.getElementById("messageInput");
+        const systemPrompt = document.getElementById("systemPrompt");
         const message = messageInput.value.trim();
+        const promptText = systemPrompt.value.trim();
 
         if (!message) return;
 
@@ -278,7 +424,10 @@
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ message }),
+              body: JSON.stringify({ 
+                message,
+                system_prompt: promptText || "다정하게"
+              }),
             }
           );
 
@@ -286,15 +435,16 @@
 
           if (response.ok) {
             addMessage(message, "user", new Date());
-            addMessage(data.message, "assistant", new Date());
+            if (data.message) {
+              addMessage(data.message, "assistant", new Date());
+            }
           }
         } catch (error) {
           console.error("Error:", error);
         }
       }
 
-      document
-        .getElementById("messageInput")
+      document.getElementById("messageInput")
         .addEventListener("keypress", function (e) {
           if (e.key === "Enter") {
             sendMessage();
@@ -306,6 +456,38 @@
         loadConversationList();
         loadConversationHistory();
       });
+
+      // 대화 삭제 함수 추가
+      async function deleteConversation(id) {
+        if (!confirm("정말로 이 대화를 삭제하시겠습니까?")) {
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `/api/v1/chatgpt/conversations/${id}/delete_conversation/`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          if (response.ok) {
+            // 현재 보고 있는 대화가 삭제된 경우
+            if (id === parseInt(conversationId)) {
+              // 새 대화 생성
+              await createNewConversation();
+            } else {
+              // 대화 목록만 새로고침
+              await loadConversationList();
+            }
+          } else {
+            alert("대화 삭제 중 오류가 발생했습니다.");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("대화 삭제 중 오류가 발생했습니다.");
+        }
+      }
     </script>
   </body>
 </html>
