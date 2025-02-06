@@ -4,24 +4,35 @@
 ## 프로젝트 소개
 연인사이의 대화를 좀 더 다정하게 만들어주는 채팅 서비스입니다.
 ## 팀원 소개
+- 한세희(리더)
 - 윤무열
+- 김현호
+- 장지윤
 
 
 ## 기술 스택
 
+### Backend
 - Python 3.10
 - Django 5.1.4
 - Django REST Framework
+- PostgreSQL
 - Redis
+
+### Frontend
+- Vue.js
+
+### Authentication
 - JWT Authentication
-- ChatGPT API
+
+### External API
+- Google ai studio API
 
 ## 주요 기능
 
 - JWT 기반 사용자 인증
-- ChatGPT API 연동
+- LLM API 연동
 - Redis 캐싱
-- API 문서화 (Swagger/Redoc)
 - 성능 모니터링 (Silk)
 
 ## 설치 방법
