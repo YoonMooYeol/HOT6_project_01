@@ -12,18 +12,22 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
-from . import config
+import os
+from dotenv import load_dotenv
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config.DJANGO_SECRET_KEY
-OPENAI_API_KEY = config.OPENAI_API_KEY
+SECRET_KEY = "django-insecure-cj*la6)jz6@8nz1e97+#p@7h0lo+3l%dv)24a!67)omgy+vsq="
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -51,11 +55,12 @@ INSTALLED_APPS = [
     "drf_spectacular",
     
     # Add the following apps
-    "articles",
-    "accounts",
-    "products",
-    "chatgpt",
 
+    
+
+    "chatgpt",
+    "accounts",
+    # "articles",
 ]
 
 

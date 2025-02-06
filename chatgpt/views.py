@@ -1,5 +1,7 @@
 # chatgpt/views.py
 import re
+import os
+from dotenv import load_dotenv
 from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -9,14 +11,14 @@ from django.contrib.auth import get_user_model
 import google.generativeai as palm
 from time import sleep
 from tenacity import retry, stop_after_attempt, wait_exponential
-
-from api_pjt.config import GOOGLE_API_KEY
 from .models import Conversation, Message
 from .serializers import ConversationSerializer
 
-
+load_dotenv()
 
 User = get_user_model()
+
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 class ChatViewSet(viewsets.ModelViewSet):
     serializer_class = ConversationSerializer
