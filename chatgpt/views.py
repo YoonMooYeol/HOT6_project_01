@@ -58,7 +58,7 @@ class ChatViewSet(viewsets.ModelViewSet):
         user_message = request.data.get('message')
         system_prompt = request.data.get(
             'system_prompt',
-            "다정하게."  # 기본값은 다정하게
+            "정말 다정하게."  # 기본값은 다정하게
         )
         
         if not user_message:
