@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Chat</title>
+    <style>
+        /* chat.html의 스타일을 복사하되 색상 테마만 변경 */
+        /* ... 기존 스타일 유지 ... */
+
+        .new-chat-btn {
+            background: #7F10A3;  /* OpenAI 테마 색상으로 변경 */
+        }
+
+        .new-chat-btn:hover {
+            background: #6a0d89;
+        }
+
+        .send-btn {
+            background: #7F10A3;
+        }
+
+        .user-message {
+            background: #7F10A3;
+        }
+
+        /* OpenAI 로고나 브랜딩을 위한 추가 스타일 */
+        .openai-branding {
+            padding: 10px;
+            text-align: center;
+            color: #7F10A3;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="openai-branding">OpenAI Chat</div>
+            <button class="new-chat-btn" onclick="createNewConversation()">
+                새로운 대화
+            </button>
+            <div class="conversation-list" id="conversationList"></div>
+        </div>
+
+        <div class="chat-container">
+            <div class="messages" id="messageContainer"></div>
+            <div class="input-container">
+                <div class="prompt-box">
+                    <textarea
+                        id="systemPrompt"
+                        placeholder="상대방의 성격을 설정하세요... (예: 귀엽게, 차갑게, 다정하게 등)"
+                        rows="3"
+                    ></textarea>
+                </div>
+                <div class="input-box">
+                    <input
+                        type="text"
+                        id="messageInput"
+                        placeholder="메시지를 입력하세요..."
+                    />
+                    <button class="send-btn" onclick="sendMessage()">전송</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let conversationId = "{{ conversation_id }}";
+
+        // chat.html의 JavaScript 함수들을 복사하되 API 엔드포인트만 변경
+        async function sendMessage() {
+            const messageInput = document.getElementById("messageInput");
+            const systemPrompt = document.getElementById("systemPrompt");
+            const message = messageInput.value.trim();
+            const promptText = systemPrompt.value.trim();
+
+            if (!message) return;
+
+            messageInput.value = "";
+
+            try {
+                const response = await fetch(
+                    `/api/v1/chatgpt/conversations/${conversationId}/chat_openai/`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ 
+                            message,
+                            system_prompt: promptText || "다정하게"
+                        }),
+                    }
+                );
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    addMessage(message, "user", new Date());
+                    if (data.message) {
+                        addMessage(data.message, "assistant", new Date());
+                    }
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+
+        // ... 나머지 JavaScript 함수들은 동일하게 유지 ...
+    </script>
+</body>
+</html> 

@@ -11,4 +11,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('chat/', ChatViewSet.as_view({'get': 'chat_interface'}), name='chat_interface'),
     path('chat_plus/', ChatViewSet.as_view({'get': 'chat_plus'}), name='chat_plus'),
+    path('chat_openai/', ChatViewSet.as_view({'get': 'chat_openai_interface'}), name='chat_openai_interface'),
 ]
