@@ -1,15 +1,15 @@
 # chat/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-# from .views import ChatViewSet
-from .views import ChatViewSet
+from .views import GeminiChatViewSet, OpenAIChatViewSet
 
-router = DefaultRouter()
-router.register(r'conversations', ChatViewSet, basename='conversation')
+gemini_router = DefaultRouter()
+gemini_router.register(r'conversations', GeminiChatViewSet, basename='gemini_conversation')
+
+openai_router = DefaultRouter()
+openai_router.register(r'conversations', OpenAIChatViewSet, basename='openai_conversation')
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('chat/', ChatViewSet.as_view({'get': 'chat_interface'}), name='chat_interface'),
-    path('chat_plus/', ChatViewSet.as_view({'get': 'chat_plus'}), name='chat_plus'),
-    path('chat_openai/', ChatViewSet.as_view({'get': 'chat_openai_interface'}), name='chat_openai_interface'),
-]
+    path('gemini/', include((gemini_router.urls, 'gemini'))),
+    path('openai/', include((openai_router.urls, 'openai'))),
+]   

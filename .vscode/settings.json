@@ -3,6 +3,7 @@
         "AILLM",
         "dotenv",
         "generativeai",
+        "redoc",
         "viewsets"
     ]
 }
