@@ -90,10 +90,10 @@ class ChatViewSet(viewsets.ModelViewSet):
 
             # 프롬프트 구성
             prompt = f"""
-규칙:
-1. 저의 메시지에 응답할 때 대립적이지 않고 부드러운 어조를 유지하면서 마치 제가 직접 말하는 것처럼 제 말로 번역해서 답변해주세요.(여기서 번역의 뜻은 한국어로 번역이 아닙니다. 다정한 말투로 나의 말을 바꿔달라는 의미입니다.) 차분하고 존중하는 태도로 상대방의 감정과 우려를 전달할 수 있는 저의 답변만을 간략하게 작성해 주세요.
-2.(제일중요)저는 ai와 대화하는게 아닙니다. 저의 연인과 대화하는중입니다. 간단하게 10글자 이내로 나의 말을 다음과 같은 태도로 번역해서 답변해주세요.
-3. 다음 입력되는 태도로 말해주십시오. : {system_prompt}
+Rule:
+1.When responding to my messages, maintain a gentle and non-confrontational tone, as if I am speaking directly. Rephrase my words in a warm and considerate manner to convey emotions and concerns respectfully. Keep responses concise and focused on delivering my intended message.
+2.(Most Important) I am not talking to an AI; I am conversing with my partner. Translate my words into a response of 10 characters or fewer that aligns with the specified tone.
+3.Speak in the following manner: {system_prompt}
 
 이전 대화:
 {conversation_history}
@@ -101,9 +101,14 @@ class ChatViewSet(viewsets.ModelViewSet):
 사용자의 메시지: {user_message}
 
 
-사용자의 메세지를 읽고 번역된 메세지를 반드시 다음의 형식으로 작성해주세요.
-답변형식: "사용자의 메세지" : "번역된 메세지"
+Read the user's message and rephrase it according to the specified style in the following format:
+Response format: “User’s message” : “Rephrased message”
+
+
+
 """
+
+
 
             # API 호출 (재시도 로직 포함)
             try:
