@@ -263,14 +263,13 @@ class RagChatViewSet(APIView):
                Translate my words into a response of 10 characters or fewer that aligns with the specified tone.
             3. Speak in the following manner: gentle, warm, and considerate.
             4. always speak korean
-
+            5. provide 3 examples of messages that can be used to respond to the user's message
             Question: {question}
             Context: {context}
 
             Read the user's message and rephrase it according to the specified style in the following format:  
             Response format: "User's message" : "Rephrased message1, Rephrased message2, Rephrased message3"
             
-            Provide three message examples so the user can choose and use one.
             """
         )
 
