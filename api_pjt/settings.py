@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     "silk",
     "django_redis",
     "drf_spectacular",
-    
+    "corsheaders",
     # Add the following apps
 
     
@@ -105,6 +105,7 @@ SIMPLE_JWT = {
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -112,6 +113,12 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "silk.middleware.SilkyMiddleware",
 ]
+
+# CORS 설정
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Vue 개발 서버
+]
+
 
 ROOT_URLCONF = "api_pjt.urls"
 
@@ -133,14 +140,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "api_pjt.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 

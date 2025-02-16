@@ -28,6 +28,7 @@ urlpatterns = [
 
 
     path("api/v1/chatgpt/", include("chatgpt.urls")),
+    path("api/v1/rag/", include("rag.urls")),
 
 ]
 
