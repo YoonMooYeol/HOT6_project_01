@@ -19,6 +19,7 @@ load_dotenv()
 User = get_user_model()
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+ANYTHING_LLM_API_KEY = os.getenv("ANYTHING_LLM_API_KEY")
 
 class ChatViewSet(viewsets.ModelViewSet):
     serializer_class = ConversationSerializer

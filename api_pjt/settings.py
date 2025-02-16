@@ -60,6 +60,7 @@ INSTALLED_APPS = [
 
     "chatgpt",
     "accounts",
+    "rag",
 
 ]
 
