@@ -268,7 +268,9 @@ class RagChatViewSet(APIView):
             Context: {context}
 
             Read the user's message and rephrase it according to the specified style in the following format:  
-            Response format: "User's message" : "Rephrased message"
+            Response format: "User's message" : "Rephrased message1, Rephrased message2, Rephrased message3"
+            
+            Provide three message examples so the user can choose and use one.
             """
         )
 
@@ -310,10 +312,15 @@ class RagChatViewSet(APIView):
 
             # 답변 추출
             try:
-                match = re.search(r':\s*"([^"]+)"', response.content)
-                translated_message = match.group(1) if match else response.content.strip()
+                # 콜론 이후의 모든 따옴표 내용을 추출
+                match = re.search(r':\s*"(.+?)(?:")?$', response.content, re.DOTALL)
+                if match:
+                    # 모든 따옴표를 제거하고 저장
+                    translated_message = match.group(1).replace('"', '').strip()
+                else:
+                    translated_message = response.content.replace('"', '').strip()
             except:
-                translated_message = response.content
+                translated_message = response.content.replace('"', '').strip()
 
             # 결과를 데이터베이스에 저장
             message_obj = Message.objects.create(
